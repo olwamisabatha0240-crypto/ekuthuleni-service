@@ -1,24 +1,221 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ekuthuleni Service | Staff Order Management</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ekuthuleni Service | Staff Order Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
 :root{--g:#087A3D;--ink:#202824;--muted:#66736d;--line:#dfe7e1;--soft:#f5f8f5;--danger:#a62d2d}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--soft);color:var(--ink)}header{background:#fff;border-bottom:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:15px;position:sticky;top:0;z-index:5}header h1{margin:0;font-size:20px;color:var(--g)}header span{font-size:13px;color:var(--muted)}button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer}.primary{background:var(--g);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.wrap{width:min(1200px,94%);margin:28px auto}.login{width:min(420px,94%);margin:70px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 8px 30px #0000000a}.login h2{margin-top:0;color:var(--g)}label{display:block;font-weight:700;font-size:13px;margin:14px 0 6px}input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}textarea{min-height:90px;resize:vertical}.error{color:var(--danger);font-size:13px;margin-top:12px}.nav{display:flex;gap:8px;margin-bottom:22px}.nav button.active{background:var(--g);color:#fff}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h2{margin:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}.stat b{font-size:27px;display:block;color:var(--g)}.stat span{font-size:12px;color:var(--muted)}.panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}th{background:#fafcfa;font-size:12px;color:var(--muted)}.order-no{font-weight:800;color:var(--g)}.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#edf5ef;font-size:11px;font-weight:700}.empty{text-align:center;padding:40px;color:var(--muted)}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal.open{display:flex}.modal-card{background:#fff;width:min(650px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:24px}.modal-head{display:flex;justify-content:space-between;gap:15px;align-items:center}.modal-head h3{margin:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.notice{background:#f5f8f5;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:18px}@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start;flex-direction:column}}
-</style></head><body>
-<div id="loginView" class="login"><h2>Ekuthuleni Staff Login</h2><p style="color:var(--muted);font-size:14px">Sign in to access the internal order management system.</p><form id="loginForm"><label>Email</label><input id="email" type="email" required autocomplete="username"><label>Password</label><input id="password" type="password" required autocomplete="current-password"><button class="primary" type="submit" style="width:100%;margin-top:18px">Sign in</button></form><div id="loginError" class="error"></div></div>
-<div id="appView" hidden><header><div><h1>EKUTHULENI SERVICE</h1><span>Internal Order Management System</span></div><button id="logout" class="secondary">Sign out</button></header><main class="wrap"><div class="nav"><button id="ordersTab" class="secondary active">Orders</button><button id="employeesTab" class="secondary" hidden>Employees</button></div>
-<section id="ordersView"><div class="top"><div><h2>Orders</h2><span style="color:var(--muted);font-size:13px">Manage and track customer orders.</span></div><button id="refresh" class="primary">Refresh orders</button></div><div class="stats"><div class="stat"><b id="receivedCount">0</b><span>Received</span></div><div class="stat"><b id="processingCount">0</b><span>Processing</span></div><div class="stat"><b id="deliveryCount">0</b><span>Out for delivery</span></div><div class="stat"><b id="completedCount">0</b><span>Completed</span></div></div><div class="panel"><div class="table-wrap"><table style="min-width:850px"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody id="ordersBody"><tr><td colspan="8" class="empty">Loading orders...</td></tr></tbody></table></div></div></section>
-<section id="employeesView" hidden><div class="top"><div><h2>Employees</h2><span style="color:var(--muted);font-size:13px">Manage Ekuthuleni employee accounts.</span></div><div style="display:flex;gap:10px"><button id="refreshEmployees" class="secondary">Refresh</button><button id="addEmployee" class="primary">+ Add employee</button></div></div><div class="notice">New staff accounts are created securely through the server-side Supabase function. Passwords are not stored in the employee profile table.</div><div class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Status</th><th>Joined</th></tr></thead><tbody id="employeesBody"><tr><td colspan="5" class="empty">Loading employees...</td></tr></tbody></table></div></div><div id="employeeError" class="error"></div></section></main></div>
-<div id="orderModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">Order</h3><button id="closeModal" class="secondary">Close</button></div><form id="orderForm"><div class="grid"><div><label>Customer name</label><input id="editName" required></div><div><label>Phone</label><input id="editPhone" required></div><div class="full"><label>Delivery address</label><input id="editAddress" required></div><div class="full"><label>Items</label><textarea id="editItems" required></textarea></div><div><label>Order amount (R)</label><input id="editAmount" type="number" min="0" step="0.01"></div><div><label>Delivery fee (R)</label><input id="editDelivery" type="number" min="0" step="0.01"></div><div><label>Payment status</label><select id="editPayment"><option>Pending</option><option>Paid</option><option>Partially Paid</option><option>Refunded</option></select></div><div><label>Order status</label><select id="editStatus"><option>Received</option><option>Confirmed</option><option>Processing</option><option>Ready</option><option>Out for delivery</option><option>Delivered</option><option>Cancelled</option></select></div><div><label>Assigned employee</label><input id="editEmployee" placeholder="Staff member"></div><div><label>Notes</label><input id="editNotes" placeholder="Internal notes"></div></div><div class="actions"><button class="primary" type="submit">Save changes</button><button id="cancelEdit" class="secondary" type="button">Cancel</button></div><div id="saveError" class="error"></div></form></div></div>
-<div id="employeeModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Add Employee</h3><button id="closeEmployeeModal" class="secondary">Close</button></div><p style="color:var(--muted);font-size:13px">Create a login for a new staff member. Give them a temporary password and ask them to change it after their first login.</p><form id="employeeForm"><div class="grid"><div class="full"><label>Full name</label><input id="employeeName" required></div><div><label>Email</label><input id="employeeEmail" type="email" required autocomplete="off"></div><div><label>Phone</label><input id="employeePhone" type="tel"></div><div><label>Temporary password</label><input id="employeePassword" type="password" minlength="8" required autocomplete="new-password"></div><div><label>Role</label><select id="employeeRole"><option value="employee">Employee</option><option value="manager">Manager</option></select></div></div><div class="actions"><button class="primary" type="submit">Create employee</button><button id="cancelEmployee" class="secondary" type="button">Cancel</button></div><div id="createEmployeeError" class="error"></div></form></div></div>
+</style>
+</head>
+<body>
+<div id="loginView" class="login">
+<h2>Ekuthuleni Staff Login</h2>
+<p style="color:var(--muted);font-size:14px">Sign in to access the internal order management system.</p>
+<form id="loginForm"><label>Email</label><input id="email" type="email" required autocomplete="username"><label>Password</label><input id="password" type="password" required autocomplete="current-password"><button class="primary" type="submit" style="width:100%;margin-top:18px">Sign in</button></form>
+<div id="loginError" class="error"></div>
+</div>
+
+<div id="appView" hidden>
+<header><div><h1>EKUTHULENI SERVICE</h1><span>Internal Order Management System</span></div><button id="logout" class="secondary">Sign out</button></header>
+<main class="wrap">
+<div class="nav"><button id="ordersTab" class="secondary active">Orders</button><button id="employeesTab" class="secondary" hidden>Employees</button></div>
+
+<section id="ordersView">
+<div class="top"><div><h2>Orders</h2><span style="color:var(--muted);font-size:13px" id="ordersSubtitle">Manage and track customer orders.</span></div><button id="refresh" class="primary">Refresh orders</button></div>
+<div class="stats"><div class="stat"><b id="receivedCount">0</b><span>Received</span></div><div class="stat"><b id="processingCount">0</b><span>Processing</span></div><div class="stat"><b id="deliveryCount">0</b><span>Out for delivery</span></div><div class="stat"><b id="completedCount">0</b><span>Completed</span></div></div>
+<div class="panel"><div class="table-wrap"><table style="min-width:900px"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Assigned to</th><th>Created</th><th></th></tr></thead><tbody id="ordersBody"><tr><td colspan="9" class="empty">Loading orders...</td></tr></tbody></table></div></div>
+</section>
+
+<section id="employeesView" hidden>
+<div class="top"><div><h2>Employees</h2><span style="color:var(--muted);font-size:13px">Manage Ekuthuleni employee accounts.</span></div><div style="display:flex;gap:10px"><button id="refreshEmployees" class="secondary">Refresh</button><button id="addEmployee" class="primary">+ Add employee</button></div></div>
+<div class="notice">New staff accounts are created securely through the server-side Supabase function. Passwords are not stored in the employee profile table.</div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Status</th><th>Joined</th></tr></thead><tbody id="employeesBody"><tr><td colspan="5" class="empty">Loading employees...</td></tr></tbody></table></div></div>
+<div id="employeeError" class="error"></div>
+</section>
+</main>
+</div>
+
+<div id="orderModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="modalTitle">Order</h3><button id="closeModal" class="secondary">Close</button></div>
+<form id="orderForm"><div class="grid">
+<div><label>Customer name</label><input id="editName" required></div>
+<div><label>Phone</label><input id="editPhone" required></div>
+<div class="full"><label>Delivery address</label><input id="editAddress" required></div>
+<div class="full"><label>Items</label><textarea id="editItems" required></textarea></div>
+<div><label>Order amount (R)</label><input id="editAmount" type="number" min="0" step="0.01"></div>
+<div><label>Delivery fee (R)</label><input id="editDelivery" type="number" min="0" step="0.01"></div>
+<div><label>Payment status</label><select id="editPayment"><option>Pending</option><option>Paid</option><option>Partially Paid</option><option>Refunded</option></select></div>
+<div><label>Order status</label><select id="editStatus"><option>Received</option><option>Confirmed</option><option>Processing</option><option>Ready</option><option>Out for delivery</option><option>Delivered</option><option>Cancelled</option></select></div>
+<div class="full"><label>Assigned employee</label><select id="editEmployee"><option value="">Unassigned</option></select></div>
+<div class="full"><label>Notes</label><input id="editNotes" placeholder="Internal notes"></div>
+</div><div class="actions"><button class="primary" type="submit">Save changes</button><button id="cancelEdit" class="secondary" type="button">Cancel</button></div><div id="saveError" class="error"></div></form>
+</div></div>
+
+<div id="employeeModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Add Employee</h3><button id="closeEmployeeModal" class="secondary">Close</button></div><p style="color:var(--muted);font-size:13px">Create a login for a new staff member. Give them a temporary password and ask them to change it after their first login.</p>
+<form id="employeeForm"><div class="grid"><div class="full"><label>Full name</label><input id="employeeName" required></div><div><label>Email</label><input id="employeeEmail" type="email" required autocomplete="off"></div><div><label>Phone</label><input id="employeePhone" type="tel"></div><div><label>Temporary password</label><input id="employeePassword" type="password" minlength="8" required autocomplete="new-password"></div><div><label>Role</label><select id="employeeRole"><option value="employee">Employee</option><option value="manager">Manager</option></select></div></div><div class="actions"><button class="primary" type="submit">Create employee</button><button id="cancelEmployee" class="secondary" type="button">Cancel</button></div><div id="createEmployeeError" class="error"></div></form>
+</div></div>
+
 <script>
-const SUPABASE_URL='https://ewigfcnvexcprrzclfju.supabase.co';const SUPABASE_PUBLISHABLE_KEY='sb_publishable_ALNHVsMe0V-qM5Bg4leNGA_3MTB7n1Y';const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);let currentOrderId=null;const $=id=>document.getElementById(id);
-function showApp(){ $('loginView').hidden=true;$('appView').hidden=false;loadOrders();checkAdmin();}function showLogin(){ $('appView').hidden=true;$('loginView').hidden=false;}
-async function checkAdmin(){const {data,error}=await db.rpc('is_admin');if(!error&&data===true){$('employeesTab').hidden=false;loadEmployees();}}
-async function loadOrders(){ $('ordersBody').innerHTML='<tr><td colspan="8" class="empty">Loading orders...</td></tr>';const {data,error}=await db.from('orders').select('*').order('created_at',{ascending:false});if(error){$('ordersBody').innerHTML='<tr><td colspan="8" class="empty">Could not load orders: '+escapeHtml(error.message)+'</td></tr>';return;}updateStats(data||[]);renderOrders(data||[]);}
-function updateStats(orders){$('receivedCount').textContent=orders.filter(o=>o.order_status==='Received').length;$('processingCount').textContent=orders.filter(o=>o.order_status==='Processing').length;$('deliveryCount').textContent=orders.filter(o=>o.order_status==='Out for delivery').length;$('completedCount').textContent=orders.filter(o=>o.order_status==='Delivered').length;}
-function renderOrders(orders){if(!orders.length){$('ordersBody').innerHTML='<tr><td colspan="8" class="empty">No orders yet.</td></tr>';return;}$('ordersBody').innerHTML=orders.map(o=>`<tr><td><span class="order-no">${escapeHtml(o.order_number)}</span></td><td>${escapeHtml(o.customer_name)}<br><span style="color:var(--muted)">${escapeHtml(o.customer_phone)}</span></td><td>${escapeHtml(o.order_items).replace(/\n/g,'<br>')}</td><td>R${Number(o.total_amount||0).toFixed(2)}</td><td><span class="badge">${escapeHtml(o.payment_status||'Pending')}</span></td><td><span class="badge">${escapeHtml(o.order_status||'Received')}</span></td><td>${new Date(o.created_at).toLocaleString()}</td><td><button class="secondary" onclick="editOrder('${o.id}')">Open</button></td></tr>`).join('');}
+const SUPABASE_URL='https://ewigfcnvexcprrzclfju.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_ALNHVsMe0V-qM5Bg4leNGA_3MTB7n1Y';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let currentOrderId=null;
+let currentRole=null;
+let employees=[];
+const $=id=>document.getElementById(id);
+
+function showApp(){ $('loginView').hidden=true; $('appView').hidden=false; initializeUser(); }
+function showLogin(){ $('appView').hidden=true; $('loginView').hidden=false; }
+
+async function initializeUser(){
+  const {data:{user}}=await db.auth.getUser();
+  if(!user){showLogin();return;}
+  const {data:profile,error}=await db.from('employee_profiles').select('full_name,role,active').eq('id',user.id).single();
+  if(error||!profile||!profile.active){alert('Your employee profile is inactive or could not be loaded.');await db.auth.signOut();showLogin();return;}
+  currentRole=profile.role;
+  $('ordersSubtitle').textContent=`Signed in as ${profile.full_name} • ${profile.role}`;
+  if(currentRole==='admin'||currentRole==='manager'){
+    $('employeesTab').hidden=false;
+    await loadEmployees();
+  }else{
+    $('employeesTab').hidden=true;
+    $('ordersSubtitle').textContent=`Assigned orders • ${profile.full_name}`;
+  }
+  await loadOrders();
+}
+
+async function loadOrders(){
+  $('ordersBody').innerHTML='<tr><td colspan="9" class="empty">Loading orders...</td></tr>';
+  const {data,error}=await db.from('orders').select('*').order('created_at',{ascending:false});
+  if(error){$('ordersBody').innerHTML='<tr><td colspan="9" class="empty">Could not load orders: '+escapeHtml(error.message)+'</td></tr>';return;}
+  updateStats(data||[]);renderOrders(data||[]);
+}
+
+function updateStats(orders){
+  $('receivedCount').textContent=orders.filter(o=>o.order_status==='Received').length;
+  $('processingCount').textContent=orders.filter(o=>o.order_status==='Processing').length;
+  $('deliveryCount').textContent=orders.filter(o=>o.order_status==='Out for delivery').length;
+  $('completedCount').textContent=orders.filter(o=>o.order_status==='Delivered').length;
+}
+
+function employeeNameById(id){const e=employees.find(x=>x.id===id);return e?e.full_name:'Unassigned';}
+
+function renderOrders(orders){
+  if(!orders.length){$('ordersBody').innerHTML='<tr><td colspan="9" class="empty">No orders available.</td></tr>';return;}
+  $('ordersBody').innerHTML=orders.map(o=>`<tr>
+    <td><span class="order-no">${escapeHtml(o.order_number)}</span></td>
+    <td>${escapeHtml(o.customer_name)}<br><span style="color:var(--muted)">${escapeHtml(o.customer_phone)}</span></td>
+    <td>${escapeHtml(o.order_items).replace(/\n/g,'<br>')}</td>
+    <td>R${Number(o.total_amount||0).toFixed(2)}</td>
+    <td><span class="badge">${escapeHtml(o.payment_status||'Pending')}</span></td>
+    <td><span class="badge">${escapeHtml(o.order_status||'Received')}</span></td>
+    <td>${escapeHtml(employeeNameById(o.assigned_employee_id))}</td>
+    <td>${new Date(o.created_at).toLocaleString()}</td>
+    <td><button class="secondary" onclick="editOrder('${o.id}')">Open</button></td>
+  </tr>`).join('');
+}
+
 function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-async function editOrder(id){const {data,error}=await db.from('orders').select('*').eq('id',id).single();if(error){alert(error.message);return;}currentOrderId=id;$('modalTitle').textContent='Order '+data.order_number;$('editName').value=data.customer_name||'';$('editPhone').value=data.customer_phone||'';$('editAddress').value=data.customer_address||'';$('editItems').value=data.order_items||'';$('editAmount').value=data.order_amount||0;$('editDelivery').value=data.delivery_fee||0;$('editPayment').value=data.payment_status||'Pending';$('editStatus').value=data.order_status||'Received';$('editEmployee').value=data.assigned_employee||'';$('editNotes').value=data.notes||'';$('saveError').textContent='';$('orderModal').classList.add('open');}
-async function saveOrder(event){event.preventDefault();$('saveError').textContent='';const amount=Number($('editAmount').value||0),delivery=Number($('editDelivery').value||0);const update={customer_name:$('editName').value.trim(),customer_phone:$('editPhone').value.trim(),customer_address:$('editAddress').value.trim(),order_items:$('editItems').value.trim(),order_amount:amount,delivery_fee:delivery,total_amount:amount+delivery,payment_status:$('editPayment').value,order_status:$('editStatus').value,assigned_employee:$('editEmployee').value.trim()||null,notes:$('editNotes').value.trim()||null,updated_at:new Date().toISOString()};const {error}=await db.from('orders').update(update).eq('id',currentOrderId);if(error){$('saveError').textContent=error.message;return;}$('orderModal').classList.remove('open');await loadOrders();}
-async function loadEmployees(){ $('employeesBody').innerHTML='<tr><td colspan="5" class="empty">Loading employees...</td></tr>';$('employeeError').textContent='';const {data,error}=await db.from('employee_profiles').select('full_name,role,phone,active,created_at').order('created_at',{ascending:true});if(error){$('employeesBody').innerHTML='<tr><td colspan="5" class="empty">Could not load employees.</td></tr>';$('employeeError').textContent=error.message;return;}if(!data.length){$('employeesBody').innerHTML='<tr><td colspan="5" class="empty">No employee profiles yet.</td></tr>';return;}$('employeesBody').innerHTML=data.map(e=>`<tr><td><strong>${escapeHtml(e.full_name)}</strong></td><td><span class="badge">${escapeHtml(e.role)}</span></td><td>${escapeHtml(e.phone||'—')}</td><td><span class="badge">${e.active?'Active':'Inactive'}</span></td><td>${new Date(e.created_at).toLocaleDateString()}</td></tr>`).join('');}
-async function createEmployee(event){event.preventDefault();$('createEmployeeError').textContent='';const {data:sessionData}=await db.auth.getSession();if(!sessionData.session){$('createEmployeeError').textContent='Your session has expired. Please sign in again.';return;}const payload={full_name:$('employeeName').value.trim(),email:$('employeeEmail').value.trim(),password:$('employeePassword').value,phone:$('employeePhone').value.trim(),role:$('employeeRole').value};const {data,error}=await db.functions.invoke('create-employee',{body:payload});if(error){$('createEmployeeError').textContent=error.message;return;}if(data?.error){$('createEmployeeError').textContent=data.error;return;}alert('Employee account created successfully.');$('employeeForm').reset();$('employeeModal').classList.remove('open');loadEmployees();}
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';const {error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){$('loginError').textContent=error.message;return;}showApp();});$('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});$('refresh').addEventListener('click',loadOrders);$('refreshEmployees').addEventListener('click',loadEmployees);$('ordersTab').addEventListener('click',()=>{$('ordersTab').classList.add('active');$('employeesTab').classList.remove('active');$('ordersView').hidden=false;$('employeesView').hidden=true;});$('employeesTab').addEventListener('click',()=>{$('employeesTab').classList.add('active');$('ordersTab').classList.remove('active');$('ordersView').hidden=true;$('employeesView').hidden=false;loadEmployees();});$('addEmployee').addEventListener('click',()=>{$('createEmployeeError').textContent='';$('employeeForm').reset();$('employeeModal').classList.add('open');});$('closeEmployeeModal').addEventListener('click',()=>$('employeeModal').classList.remove('open'));$('cancelEmployee').addEventListener('click',()=>$('employeeModal').classList.remove('open'));$('closeModal').addEventListener('click',()=>$('orderModal').classList.remove('open'));$('cancelEdit').addEventListener('click',()=>$('orderModal').classList.remove('open'));$('orderForm').addEventListener('submit',saveOrder);$('employeeForm').addEventListener('submit',createEmployee);(async()=>{const {data}=await db.auth.getSession();if(data.session)showApp();})();
-</script></body></html>
+
+async function loadEmployees(){
+  const {data,error}=await db.from('employee_profiles').select('id,full_name,role,phone,active,created_at').order('created_at',{ascending:true});
+  if(error){employees=[];$('employeeError').textContent=error.message;return;}
+  employees=data||[];
+  renderEmployees();
+  populateEmployeeSelect();
+}
+
+function renderEmployees(){
+  if(!employees.length){$('employeesBody').innerHTML='<tr><td colspan="5" class="empty">No employee profiles yet.</td></tr>';return;}
+  $('employeesBody').innerHTML=employees.map(e=>`<tr><td><strong>${escapeHtml(e.full_name)}</strong></td><td><span class="badge">${escapeHtml(e.role)}</span></td><td>${escapeHtml(e.phone||'—')}</td><td><span class="badge">${e.active?'Active':'Inactive'}</span></td><td>${new Date(e.created_at).toLocaleDateString()}</td></tr>`).join('');
+}
+
+function populateEmployeeSelect(selectedId=''){
+  const select=$('editEmployee');
+  select.innerHTML='<option value="">Unassigned</option>';
+  employees.filter(e=>e.active).forEach(e=>{
+    const option=document.createElement('option');
+    option.value=e.id;
+    option.textContent=`${e.full_name} — ${e.role}`;
+    select.appendChild(option);
+  });
+  select.value=selectedId||'';
+}
+
+async function editOrder(id){
+  const {data,error}=await db.from('orders').select('*').eq('id',id).single();
+  if(error){alert(error.message);return;}
+  currentOrderId=id;
+  $('modalTitle').textContent='Order '+data.order_number;
+  $('editName').value=data.customer_name||'';
+  $('editPhone').value=data.customer_phone||'';
+  $('editAddress').value=data.customer_address||'';
+  $('editItems').value=data.order_items||'';
+  $('editAmount').value=data.order_amount||0;
+  $('editDelivery').value=data.delivery_fee||0;
+  $('editPayment').value=data.payment_status||'Pending';
+  $('editStatus').value=data.order_status||'Received';
+  populateEmployeeSelect(data.assigned_employee_id||'');
+  $('editNotes').value=data.notes||'';
+  $('saveError').textContent='';
+  applyRoleToOrderForm();
+  $('orderModal').classList.add('open');
+}
+
+function applyRoleToOrderForm(){
+  const employeeMode=currentRole==='employee';
+  ['editName','editPhone','editAddress','editItems','editAmount','editDelivery','editPayment','editEmployee'].forEach(id=>$(id).disabled=employeeMode);
+  $('editNotes').disabled=false;
+  $('editStatus').disabled=false;
+  if(employeeMode){$('editNotes').placeholder='Work notes for this assigned order';}
+}
+
+async function saveOrder(event){
+  event.preventDefault();
+  $('saveError').textContent='';
+  const amount=Number($('editAmount').value||0),delivery=Number($('editDelivery').value||0);
+  let update;
+  if(currentRole==='employee'){
+    update={order_status:$('editStatus').value,notes:$('editNotes').value.trim()||null,updated_at:new Date().toISOString()};
+  }else{
+    update={customer_name:$('editName').value.trim(),customer_phone:$('editPhone').value.trim(),customer_address:$('editAddress').value.trim(),order_items:$('editItems').value.trim(),order_amount:amount,delivery_fee:delivery,total_amount:amount+delivery,payment_status:$('editPayment').value,order_status:$('editStatus').value,assigned_employee_id:$('editEmployee').value||null,notes:$('editNotes').value.trim()||null,updated_at:new Date().toISOString()};
+  }
+  const {error}=await db.from('orders').update(update).eq('id',currentOrderId);
+  if(error){$('saveError').textContent=error.message;return;}
+  $('orderModal').classList.remove('open');
+  await loadOrders();
+}
+
+async function createEmployee(event){
+  event.preventDefault();
+  $('createEmployeeError').textContent='';
+  const {data:sessionData}=await db.auth.getSession();
+  if(!sessionData.session){$('createEmployeeError').textContent='Your session has expired. Please sign in again.';return;}
+  const payload={full_name:$('employeeName').value.trim(),email:$('employeeEmail').value.trim(),password:$('employeePassword').value,phone:$('employeePhone').value.trim(),role:$('employeeRole').value};
+  const {data,error}=await db.functions.invoke('create-employee',{body:payload});
+  if(error){$('createEmployeeError').textContent=error.message;return;}
+  if(data?.error){$('createEmployeeError').textContent=data.error;return;}
+  alert('Employee account created successfully.');
+  $('employeeForm').reset();
+  $('employeeModal').classList.remove('open');
+  await loadEmployees();
+}
+
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';const {error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){$('loginError').textContent=error.message;return;}showApp();});
+$('logout').addEventListener('click',async()=>{await db.auth.signOut();showLogin();});
+$('refresh').addEventListener('click',loadOrders);
+$('refreshEmployees').addEventListener('click',loadEmployees);
+$('ordersTab').addEventListener('click',()=>{$('ordersTab').classList.add('active');$('employeesTab').classList.remove('active');$('ordersView').hidden=false;$('employeesView').hidden=true;});
+$('employeesTab').addEventListener('click',()=>{$('employeesTab').classList.add('active');$('ordersTab').classList.remove('active');$('ordersView').hidden=true;$('employeesView').hidden=false;loadEmployees();});
+$('addEmployee').addEventListener('click',()=>{$('createEmployeeError').textContent='';$('employeeForm').reset();$('employeeModal').classList.add('open');});
+$('closeEmployeeModal').addEventListener('click',()=>$('employeeModal').classList.remove('open'));
+$('cancelEmployee').addEventListener('click',()=>$('employeeModal').classList.remove('open'));
+$('closeModal').addEventListener('click',()=>$('orderModal').classList.remove('open'));
+$('cancelEdit').addEventListener('click',()=>$('orderModal').classList.remove('open'));
+$('orderForm').addEventListener('submit',saveOrder);
+$('employeeForm').addEventListener('submit',createEmployee);
+(async()=>{const {data}=await db.auth.getSession();if(data.session)showApp();})();
+</script>
+</body>
+</html>
