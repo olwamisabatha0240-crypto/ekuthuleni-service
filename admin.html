@@ -31,7 +31,7 @@
 <section id="employeesView" hidden>
 <div class="top"><div><h2>Employees</h2><span style="color:var(--muted);font-size:13px">Manage Ekuthuleni employee accounts.</span></div><div style="display:flex;gap:10px"><button id="refreshEmployees" class="secondary">Refresh</button><button id="addEmployee" class="primary">+ Add employee</button></div></div>
 <div class="notice">New staff accounts are created securely through the server-side Supabase function. Passwords are not stored in the employee profile table.</div>
-<div class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Status</th><th>Joined</th></tr></thead><tbody id="employeesBody"><tr><td colspan="5" class="empty">Loading employees...</td></tr></tbody></table></div></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Status</th><th>Joined</th><th></th></tr></thead><tbody id="employeesBody"><tr><td colspan="6" class="empty">Loading employees...</td></tr></tbody></table></div></div>
 <div id="employeeError" class="error"></div>
 </section>
 </main>
@@ -62,7 +62,56 @@
 </div><div id="saveError" class="error"></div></form>
 <div id="employeeModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Add Employee</h3><button id="closeEmployeeModal" class="secondary">Close</button></div><p style="color:var(--muted);font-size:13px">Create a login for a new staff member. Give them a temporary password and ask them to change it after their first login.</p>
 <form id="employeeForm"><div class="grid"><div class="full"><label>Full name</label><input id="employeeName" required></div><div><label>Email</label><input id="employeeEmail" type="email" required autocomplete="off"></div><div><label>Phone</label><input id="employeePhone" type="tel"></div><div><label>Temporary password</label><input id="employeePassword" type="password" minlength="8" required autocomplete="new-password"></div><div><label>Role</label><select id="employeeRole"><option value="employee">Employee</option><option value="manager">Manager</option></select></div></div><div class="actions"><button class="primary" type="submit">Create employee</button><button id="cancelEmployee" class="secondary" type="button">Cancel</button></div><div id="createEmployeeError" class="error"></div></form>
-</div></div>
+</div></div> 
+
+<div id="editEmployeeModal" class="modal">
+<div class="modal-card">
+<div class="modal-head">
+<h3>Edit Employee</h3>
+<button id="closeEditEmployeeModal" class="secondary" type="button">Close</button>
+</div>
+
+<form id="editEmployeeForm">
+<div class="grid">
+
+<div class="full">
+<label>Full name</label>
+<input id="editEmployeeName" required>
+</div>
+
+<div>
+<label>Phone</label>
+<input id="editEmployeePhone" type="tel">
+</div>
+
+<div>
+<label>Role</label>
+<select id="editEmployeeRole">
+<option value="employee">Employee</option>
+<option value="manager">Manager</option>
+</select>
+</div>
+
+<div>
+<label>Status</label>
+<select id="editEmployeeActive">
+<option value="true">Active</option>
+<option value="false">Inactive</option>
+</select>
+</div>
+
+</div>
+
+<div class="actions">
+<button class="primary" type="submit">Save changes</button>
+<button id="cancelEditEmployee" class="secondary" type="button">Cancel</button>
+</div>
+
+<div id="editEmployeeError" class="error"></div>
+</form>
+
+</div>
+</div>
 
 <script>
 const SUPABASE_URL='https://ewigfcnvexcprrzclfju.supabase.co';
@@ -135,8 +184,19 @@ async function loadEmployees(){
 }
 
 function renderEmployees(){
-  if(!employees.length){$('employeesBody').innerHTML='<tr><td colspan="5" class="empty">No employee profiles yet.</td></tr>';return;}
-  $('employeesBody').innerHTML=employees.map(e=>`<tr><td><strong>${escapeHtml(e.full_name)}</strong></td><td><span class="badge">${escapeHtml(e.role)}</span></td><td>${escapeHtml(e.phone||'—')}</td><td><span class="badge">${e.active?'Active':'Inactive'}</span></td><td>${new Date(e.created_at).toLocaleDateString()}</td></tr>`).join('');
+  if(!employees.length){
+    $('employeesBody').innerHTML='<tr><td colspan="6" class="empty">No employee profiles yet.</td></tr>';
+    return;
+  }
+
+  $('employeesBody').innerHTML=employees.map(e=>`<tr>
+    <td><strong>${escapeHtml(e.full_name)}</strong></td>
+    <td><span class="badge">${escapeHtml(e.role)}</span></td>
+    <td>${escapeHtml(e.phone||'—')}</td>
+    <td><span class="badge">${e.active?'Active':'Inactive'}</span></td>
+    <td>${new Date(e.created_at).toLocaleDateString()}</td>
+    <td><button class="secondary" onclick="editEmployee('${e.id}')">Edit</button></td>
+  </tr>`).join('');
 }
 
 function populateEmployeeSelect(selectedId=''){
@@ -150,7 +210,24 @@ function populateEmployeeSelect(selectedId=''){
   });
   select.value=selectedId||'';
 }
+async function editEmployee(id){
+  const employee=employees.find(e=>e.id===id);
 
+  if(!employee){
+    alert('Employee could not be found.');
+    return;
+  }
+
+  $('editEmployeeName').value=employee.full_name||'';
+  $('editEmployeePhone').value=employee.phone||'';
+  $('editEmployeeRole').value=employee.role||'employee';
+  $('editEmployeeActive').value=employee.active?'true':'false';
+
+  $('editEmployeeError').textContent='';
+  $('editEmployeeModal').classList.add('open');
+
+  window.currentEditingEmployeeId=id;
+}
 function updatePaymentSummary(){
   const amount=Number($('editAmount').value||0);
   const delivery=Number($('editDelivery').value||0);
@@ -264,7 +341,48 @@ $('closeModal').addEventListener('click',()=>$('orderModal').classList.remove('o
 $('cancelEdit').addEventListener('click',()=>$('orderModal').classList.remove('open'));
 $('orderForm').addEventListener('submit',saveOrder);
 $('employeeForm').addEventListener('submit',createEmployee);
-$('generateReceipt').addEventListener('click',()=>{
+$('editEmployeeForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  $('editEmployeeError').textContent='';
+
+  const id=window.currentEditingEmployeeId;
+
+  if(!id){
+    $('editEmployeeError').textContent='No employee selected.';
+    return;
+  }
+
+  const update={
+    full_name:$('editEmployeeName').value.trim(),
+    phone:$('editEmployeePhone').value.trim()||null,
+    role:$('editEmployeeRole').value,
+    active:$('editEmployeeActive').value==='true'
+  };
+
+  const {error}=await db
+    .from('employee_profiles')
+    .update(update)
+    .eq('id',id);
+
+  if(error){
+    $('editEmployeeError').textContent=error.message;
+    return;
+  }
+
+  $('editEmployeeModal').classList.remove('open');
+  window.currentEditingEmployeeId=null;
+
+  await loadEmployees();
+});
+$('closeEditEmployeeModal').addEventListener('click',()=>{
+  $('editEmployeeModal').classList.remove('open');
+});
+
+$('cancelEditEmployee').addEventListener('click',()=>{
+  $('editEmployeeModal').classList.remove('open');
+});
+  $('generateReceipt').addEventListener('click',()=>{
   if(!currentOrderId)return;
   window.open(
     'receipt.html?id='+encodeURIComponent(currentOrderId),
