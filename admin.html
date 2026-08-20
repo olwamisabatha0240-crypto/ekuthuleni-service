@@ -53,9 +53,13 @@
 <div class="payment-summary"><label style="margin-top:0">Balance due</label><strong id="editBalanceDue">R0.00</strong></div>
 <div class="full"><label>Assigned employee</label><select id="editEmployee"><option value="">Unassigned</option></select></div>
 <div class="full"><label>Notes</label><input id="editNotes" placeholder="Internal notes"></div>
-</div><div class="actions"><button class="primary" type="submit">Save changes</button><button id="cancelEdit" class="secondary" type="button">Cancel</button></div><div id="saveError" class="error"></div></form>
-</div></div>
 
+</div></div>
+</div><div class="actions">
+<button class="primary" type="submit">Save changes</button>
+<button id="generateReceipt" class="secondary" type="button">Generate Receipt</button>
+<button id="cancelEdit" class="secondary" type="button">Cancel</button>
+</div><div id="saveError" class="error"></div></form>
 <div id="employeeModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Add Employee</h3><button id="closeEmployeeModal" class="secondary">Close</button></div><p style="color:var(--muted);font-size:13px">Create a login for a new staff member. Give them a temporary password and ask them to change it after their first login.</p>
 <form id="employeeForm"><div class="grid"><div class="full"><label>Full name</label><input id="employeeName" required></div><div><label>Email</label><input id="employeeEmail" type="email" required autocomplete="off"></div><div><label>Phone</label><input id="employeePhone" type="tel"></div><div><label>Temporary password</label><input id="employeePassword" type="password" minlength="8" required autocomplete="new-password"></div><div><label>Role</label><select id="employeeRole"><option value="employee">Employee</option><option value="manager">Manager</option></select></div></div><div class="actions"><button class="primary" type="submit">Create employee</button><button id="cancelEmployee" class="secondary" type="button">Cancel</button></div><div id="createEmployeeError" class="error"></div></form>
 </div></div>
@@ -260,6 +264,13 @@ $('closeModal').addEventListener('click',()=>$('orderModal').classList.remove('o
 $('cancelEdit').addEventListener('click',()=>$('orderModal').classList.remove('open'));
 $('orderForm').addEventListener('submit',saveOrder);
 $('employeeForm').addEventListener('submit',createEmployee);
+$('generateReceipt').addEventListener('click',()=>{
+  if(!currentOrderId)return;
+  window.open(
+    'receipt.html?id='+encodeURIComponent(currentOrderId),
+    '_blank'
+  );
+});
 ['editAmount','editDelivery','editAmountPaid'].forEach(id=>$(id).addEventListener('input',updatePaymentSummary));
 (async()=>{const {data}=await db.auth.getSession();if(data.session)showApp();})();
 </script>
