@@ -195,7 +195,7 @@ function renderEmployees(){
     <td>${escapeHtml(e.phone||'—')}</td>
     <td><span class="badge">${e.active?'Active':'Inactive'}</span></td>
     <td>${new Date(e.created_at).toLocaleDateString()}</td>
-    <td><button class="secondary" onclick="editEmployee('${e.id}')">Edit</button></td>
+    <td>${currentRole==='admin'?`<button class="secondary" onclick="editEmployee('${e.id}')">Edit</button>`:''}</td>
   </tr>`).join('');
 }
 
