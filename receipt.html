@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ekuthuleni Service | Receipt</title>
+<style>
+:root{--g:#087A3D;--ink:#202824;--muted:#66736d;--line:#dfe7e1}
+*{box-sizing:border-box}
+body{margin:0;background:#f5f8f5;color:var(--ink);font-family:Arial,sans-serif}
+.receipt{width:min(720px,94%);margin:30px auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px;box-shadow:0 8px 30px #0000000a}
+.head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid var(--g);padding-bottom:18px;margin-bottom:20px}
+.head h1{margin:0;color:var(--g);font-size:24px}.head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.order{text-align:right}.order strong{display:block;color:var(--g);font-size:18px}.order span{font-size:12px;color:var(--muted)}
+.section{margin:18px 0}.section h3{font-size:13px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.customer{line-height:1.6;font-size:14px}.items{white-space:pre-wrap;line-height:1.7;font-size:14px;border-top:1px solid var(--line);padding-top:12px}
+.totals{margin-top:20px;border-top:2px solid var(--line);padding-top:12px}.row{display:flex;justify-content:space-between;gap:20px;padding:6px 0;font-size:14px}.row.total{font-size:18px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:12px}.row.balance{font-weight:800;color:var(--g)}
+.payment{margin-top:18px;background:#f5f8f5;border:1px solid var(--line);border-radius:10px;padding:12px}.payment .row{padding:4px 0}
+.footer{text-align:center;border-top:1px solid var(--line);margin-top:25px;padding-top:18px;color:var(--muted);font-size:12px;line-height:1.6}
+.actions{text-align:center;margin:18px auto;display:flex;justify-content:center;gap:10px}.actions button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}.actions .print{background:var(--g);color:#fff;border-color:var(--g)}
+.error{text-align:center;color:#a62d2d;padding:30px}
+@media print{body{background:#fff}.receipt{width:100%;margin:0;border:0;box-shadow:none;padding:10px}.actions{display:none}}
+@media(max-width:600px){.head{flex-direction:column}.order{text-align:left}}
+</style>
+</head>
+<body>
+<div id="app"><div class="receipt" id="receipt"><div class="error">Loading receipt...</div></div><div class="actions"><button class="print" onclick="window.print()">Print / Save PDF</button><button onclick="window.close()">Close</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://ewigfcnvexcprrzclfju.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_ALNHVsMe0V-qM5Bg4leNGA_3MTB7n1Y';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const id=new URLSearchParams(location.search).get('id');
+const $=x=>document.getElementById(x);
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function money(v){return `R${Number(v||0).toFixed(2)}`;}
+async function load(){
+  if(!id){$('receipt').innerHTML='<div class="error">No order was specified.</div>';return;}
+  const {data:{user}}=await db.auth.getUser();
+  if(!user){$('receipt').innerHTML='<div class="error">Please sign in to the staff system first.</div>';return;}
+  const {data:profile}=await db.from('employee_profiles').select('role,active').eq('id',user.id).single();
+  if(!profile||!profile.active||!['admin','manager'].includes(profile.role)){$('receipt').innerHTML='<div class="error">You do not have permission to view receipts.</div>';return;}
+  const {data:o,error}=await db.from('orders').select('*').eq('id',id).single();
+  if(error||!o){$('receipt').innerHTML='<div class="error">Could not load this order.</div>';return;}
+  const total=Number(o.total_amount||Number(o.order_amount||0)+Number(o.delivery_fee||0));
+  const paid=Number(o.amount_paid||0);
+  const balance=Math.max(0,total-paid);
+  const created=o.created_at?new Date(o.created_at).toLocaleString():'—';
+  const paidAt=o.paid_at?new Date(o.paid_at).toLocaleString():'—';
+  $('receipt').innerHTML=`
+    <div class="head"><div><h1>EKUTHULENI SERVICE</h1><p>Order Receipt</p></div><div class="order"><strong>${esc(o.order_number)}</strong><span>${esc(created)}</span></div></div>
+    <div class="section"><h3>Customer</h3><div class="customer"><strong>${esc(o.customer_name)}</strong><br>${esc(o.customer_phone)}<br>${esc(o.customer_address)}</div></div>
+    <div class="section"><h3>Order</h3><div class="items">${esc(o.order_items)}</div></div>
+    <div class="totals">
+      <div class="row"><span>Order amount</span><strong>${money(o.order_amount)}</strong></div>
+      <div class="row"><span>Delivery fee</span><strong>${money(o.delivery_fee)}</strong></div>
+      <div class="row total"><span>Total</span><strong>${money(total)}</strong></div>
+      <div class="row"><span>Amount paid</span><strong>${money(paid)}</strong></div>
+      <div class="row balance"><span>Balance due</span><strong>${money(balance)}</strong></div>
+    </div>
+    <div class="payment"><div class="row"><span>Payment status</span><strong>${esc(o.payment_status||'Pending')}</strong></div><div class="row"><span>Payment method</span><strong>${esc(o.payment_method||'Not recorded')}</strong></div><div class="row"><span>Reference</span><strong>${esc(o.payment_reference||'—')}</strong></div><div class="row"><span>Payment recorded</span><strong>${esc(paidAt)}</strong></div></div>
+    <div class="footer">Thank you for using EKUTHULENI SERVICE.<br>Please keep this receipt for your records.</div>`;
+}
+load();
+</script>
+</body>
+</html>
