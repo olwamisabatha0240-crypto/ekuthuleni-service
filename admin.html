@@ -6,7 +6,7 @@
 <title>Ekuthuleni Service | Staff Order Management</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--g:#087A3D;--ink:#202824;--muted:#66736d;--line:#dfe7e1;--soft:#f5f8f5;--danger:#a62d2d}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--soft);color:var(--ink)}header{background:#fff;border-bottom:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:15px;position:sticky;top:0;z-index:5}header h1{margin:0;font-size:20px;color:var(--g)}header span{font-size:13px;color:var(--muted)}button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer}.primary{background:var(--g);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.wrap{width:min(1200px,94%);margin:28px auto}.login{width:min(420px,94%);margin:70px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 8px 30px #0000000a}.login h2{margin-top:0;color:var(--g)}label{display:block;font-weight:700;font-size:13px;margin:14px 0 6px}input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}textarea{min-height:90px;resize:vertical}.error{color:var(--danger);font-size:13px;margin-top:12px}.nav{display:flex;gap:8px;margin-bottom:22px}.nav button.active{background:var(--g);color:#fff}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h2{margin:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}.stat b{font-size:27px;display:block;color:var(--g)}.stat span{font-size:12px;color:var(--muted)}.panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}th{background:#fafcfa;font-size:12px;color:var(--muted)}.order-no{font-weight:800;color:var(--g)}.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#edf5ef;font-size:11px;font-weight:700}.empty{text-align:center;padding:40px;color:var(--muted)}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal.open{display:flex}.modal-card{background:#fff;width:min(650px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:24px}.modal-head{display:flex;justify-content:space-between;gap:15px;align-items:center}.modal-head h3{margin:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.notice{background:#f5f8f5;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:18px}@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start;flex-direction:column}}
+:root{--g:#087A3D;--ink:#202824;--muted:#66736d;--line:#dfe7e1;--soft:#f5f8f5;--danger:#a62d2d}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--soft);color:var(--ink)}header{background:#fff;border-bottom:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:15px;position:sticky;top:0;z-index:5}header h1{margin:0;font-size:20px;color:var(--g)}header span{font-size:13px;color:var(--muted)}button{border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer}.primary{background:var(--g);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.wrap{width:min(1200px,94%);margin:28px auto}.login{width:min(420px,94%);margin:70px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 8px 30px #0000000a}.login h2{margin-top:0;color:var(--g)}label{display:block;font-weight:700;font-size:13px;margin:14px 0 6px}input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}input[readonly]{background:#f5f8f5}.payment-summary{background:#f5f8f5;border:1px solid var(--line);border-radius:10px;padding:12px}.payment-summary strong{font-size:18px;color:var(--g)}.error{color:var(--danger);font-size:13px;margin-top:12px}.nav{display:flex;gap:8px;margin-bottom:22px}.nav button.active{background:var(--g);color:#fff}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h2{margin:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}.stat b{font-size:27px;display:block;color:var(--g)}.stat span{font-size:12px;color:var(--muted)}.panel{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}th{background:#fafcfa;font-size:12px;color:var(--muted)}.order-no{font-weight:800;color:var(--g)}.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#edf5ef;font-size:11px;font-weight:700}.empty{text-align:center;padding:40px;color:var(--muted)}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal.open{display:flex}.modal-card{background:#fff;width:min(650px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:24px}.modal-head{display:flex;justify-content:space-between;gap:15px;align-items:center}.modal-head h3{margin:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.notice{background:#f5f8f5;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:18px}@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -47,6 +47,10 @@
 <div><label>Delivery fee (R)</label><input id="editDelivery" type="number" min="0" step="0.01"></div>
 <div><label>Payment status</label><select id="editPayment"><option>Pending</option><option>Paid</option><option>Partially Paid</option><option>Refunded</option></select></div>
 <div><label>Order status</label><select id="editStatus"><option>Received</option><option>Confirmed</option><option>Processing</option><option>Ready</option><option>Out for delivery</option><option>Delivered</option><option>Cancelled</option></select></div>
+<div><label>Amount paid (R)</label><input id="editAmountPaid" type="number" min="0" step="0.01"></div>
+<div><label>Payment method</label><select id="editPaymentMethod"><option value="">Not recorded</option><option>Cash</option><option>EFT</option><option>Card</option><option>Other</option></select></div>
+<div><label>Payment reference</label><input id="editPaymentReference" placeholder="Optional reference"></div>
+<div class="payment-summary"><label style="margin-top:0">Balance due</label><strong id="editBalanceDue">R0.00</strong></div>
 <div class="full"><label>Assigned employee</label><select id="editEmployee"><option value="">Unassigned</option></select></div>
 <div class="full"><label>Notes</label><input id="editNotes" placeholder="Internal notes"></div>
 </div><div class="actions"><button class="primary" type="submit">Save changes</button><button id="cancelEdit" class="secondary" type="button">Cancel</button></div><div id="saveError" class="error"></div></form>
@@ -108,7 +112,7 @@ function renderOrders(orders){
     <td>${escapeHtml(o.customer_name)}<br><span style="color:var(--muted)">${escapeHtml(o.customer_phone)}</span></td>
     <td>${escapeHtml(o.order_items).replace(/\n/g,'<br>')}</td>
     <td>R${Number(o.total_amount||0).toFixed(2)}</td>
-    <td><span class="badge">${escapeHtml(o.payment_status||'Pending')}</span></td>
+    <td><span class="badge">${escapeHtml(o.payment_status||'Pending')}</span>${Number(o.balance_due||0)>0?`<br><small>Due R${Number(o.balance_due).toFixed(2)}</small>`:''}</td>
     <td><span class="badge">${escapeHtml(o.order_status||'Received')}</span></td>
     <td>${escapeHtml(employeeNameById(o.assigned_employee_id))}</td>
     <td>${new Date(o.created_at).toLocaleString()}</td>
@@ -143,6 +147,15 @@ function populateEmployeeSelect(selectedId=''){
   select.value=selectedId||'';
 }
 
+function updatePaymentSummary(){
+  const amount=Number($('editAmount').value||0);
+  const delivery=Number($('editDelivery').value||0);
+  const paid=Number($('editAmountPaid').value||0);
+  const total=Math.max(0,amount+delivery);
+  const balance=Math.max(0,total-paid);
+  $('editBalanceDue').textContent=`R${balance.toFixed(2)}`;
+}
+
 async function editOrder(id){
   const {data,error}=await db.from('orders').select('*').eq('id',id).single();
   if(error){alert(error.message);return;}
@@ -156,6 +169,10 @@ async function editOrder(id){
   $('editDelivery').value=data.delivery_fee||0;
   $('editPayment').value=data.payment_status||'Pending';
   $('editStatus').value=data.order_status||'Received';
+  $('editAmountPaid').value=Number(data.amount_paid||0);
+  $('editPaymentMethod').value=data.payment_method||'';
+  $('editPaymentReference').value=data.payment_reference||'';
+  $('editBalanceDue').textContent=`R${Number(data.balance_due||0).toFixed(2)}`;
   populateEmployeeSelect(data.assigned_employee_id||'');
   $('editNotes').value=data.notes||'';
   $('saveError').textContent='';
@@ -165,7 +182,9 @@ async function editOrder(id){
 
 function applyRoleToOrderForm(){
   const employeeMode=currentRole==='employee';
+  const paymentFields=['editPayment','editAmountPaid','editPaymentMethod','editPaymentReference'];
   ['editName','editPhone','editAddress','editItems','editAmount','editDelivery','editPayment','editEmployee'].forEach(id=>$(id).disabled=employeeMode);
+  paymentFields.forEach(id=>$(id).disabled=employeeMode);
   $('editNotes').disabled=false;
   $('editStatus').disabled=false;
   if(employeeMode){$('editNotes').placeholder='Work notes for this assigned order';}
@@ -179,7 +198,33 @@ async function saveOrder(event){
   if(currentRole==='employee'){
     update={order_status:$('editStatus').value,notes:$('editNotes').value.trim()||null,updated_at:new Date().toISOString()};
   }else{
-    update={customer_name:$('editName').value.trim(),customer_phone:$('editPhone').value.trim(),customer_address:$('editAddress').value.trim(),order_items:$('editItems').value.trim(),order_amount:amount,delivery_fee:delivery,total_amount:amount+delivery,payment_status:$('editPayment').value,order_status:$('editStatus').value,assigned_employee_id:$('editEmployee').value||null,notes:$('editNotes').value.trim()||null,updated_at:new Date().toISOString()};
+    const total=Math.max(0,amount+delivery);
+    const paid=Math.max(0,Number($('editAmountPaid').value||0));
+    if(paid>total){$('saveError').textContent='Amount paid cannot be greater than the order total.';return;}
+    const balance=Math.max(0,total-paid);
+    let paymentStatus=$('editPayment').value;
+    if(paymentStatus!=='Refunded'){
+      paymentStatus=paid<=0?'Pending':paid>=total?'Paid':'Partially Paid';
+    }
+    update={
+      customer_name:$('editName').value.trim(),
+      customer_phone:$('editPhone').value.trim(),
+      customer_address:$('editAddress').value.trim(),
+      order_items:$('editItems').value.trim(),
+      order_amount:amount,
+      delivery_fee:delivery,
+      total_amount:total,
+      payment_status:paymentStatus,
+      amount_paid:paid,
+      balance_due:balance,
+      payment_method:$('editPaymentMethod').value||null,
+      payment_reference:$('editPaymentReference').value.trim()||null,
+      paid_at:paid>0?new Date().toISOString():null,
+      order_status:$('editStatus').value,
+      assigned_employee_id:$('editEmployee').value||null,
+      notes:$('editNotes').value.trim()||null,
+      updated_at:new Date().toISOString()
+    };
   }
   const {error}=await db.from('orders').update(update).eq('id',currentOrderId);
   if(error){$('saveError').textContent=error.message;return;}
@@ -215,6 +260,7 @@ $('closeModal').addEventListener('click',()=>$('orderModal').classList.remove('o
 $('cancelEdit').addEventListener('click',()=>$('orderModal').classList.remove('open'));
 $('orderForm').addEventListener('submit',saveOrder);
 $('employeeForm').addEventListener('submit',createEmployee);
+['editAmount','editDelivery','editAmountPaid'].forEach(id=>$(id).addEventListener('input',updatePaymentSummary));
 (async()=>{const {data}=await db.auth.getSession();if(data.session)showApp();})();
 </script>
 </body>
