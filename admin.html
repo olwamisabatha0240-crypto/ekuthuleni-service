@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#087A3D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ekuthuleni">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ekuthuleni Service | Staff Order Management</title>
@@ -391,6 +397,15 @@ $('cancelEditEmployee').addEventListener('click',()=>{
 });
 ['editAmount','editDelivery','editAmountPaid'].forEach(id=>$(id).addEventListener('input',updatePaymentSummary));
 (async()=>{const {data}=await db.auth.getSession();if(data.session)showApp();})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Ekuthuleni service worker registered'))
+      .catch(error => console.error('Service worker registration failed:', error));
+  });
+}
 </script>
 </body>
 </html>
